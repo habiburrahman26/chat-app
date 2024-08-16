@@ -20,6 +20,8 @@ const moveCursor = (dx, dy) => {
   });
 };
 
+let id;
+
 const socket = net.createConnection(
   {
     port: 3008,
@@ -29,25 +31,29 @@ const socket = net.createConnection(
     console.log('Connected to the server');
 
     const ask = async () => {
+      const message = await rl.question('Enter a message > ');
       moveCursor(0, -1);
       clearLine(0);
-      const message = await rl.question('Enter a message > ');
-      socket.write(message);
+      socket.write(`${id}-message-${message}`);
     };
 
     ask();
 
     socket.on('data', (data) => {
-      console.log()
-      moveCursor(0,-1);
-      clearLine(0)
-      console.log(data.toString('utf-8'));
-      ask()
+      if (data.toString('utf-8').substring(0, 2) === 'id') {
+        id = data.toString('utf-8').substring(3);
+        console.log(`Your id is: ${id}! \n`);
+      } else {
+        console.log();
+        moveCursor(0, -1);
+        clearLine(0);
+        console.log(data.toString('utf-8'));
+      }
+
+      ask();
     });
   }
 );
-
-
 
 socket.on('end', () => {
   console.log('connection end');
