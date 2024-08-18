@@ -27,7 +27,7 @@ server.on('connection', (socket) => {
 
   clients.push({ id: clientId.toString(), socket });
 
-  socket.on('end',()=>{
+  socket.on('error',()=>{
     clients.map(c=>{
       c.socket.write(`User ${clientId} left`)
     })
